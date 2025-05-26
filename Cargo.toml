@@ -1,0 +1,11 @@
+[package]
+name = "castep-cell-parser"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# chumsky = "0.10.1"
+derive_builder = "0.20.2"
+from-pest = "0.3.3"
+pest = "2.8.0"
+pest_derive = "2.8.0"

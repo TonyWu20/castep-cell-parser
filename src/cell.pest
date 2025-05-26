@@ -1,0 +1,30 @@
+WHITESPACE  = _{ " " | NEWLINE | "\t" }
+COMMENT     = _{ "#" ~ (!(NEWLINE | "%") ~ ANY)* | "!" ~ (!(NEWLINE | "%") ~ ANY)* }
+number      =  { ASCII_DIGIT+ }
+sign        =  { "-" | "+" }
+integer     = @{ ("-" | "+")? ~ number }
+pos_integer = @{ ("+")? ~ number }
+real        = @{
+    ("-" | "+")? ~ number? ~ "." ~ number ~ ^"e" ~ ("-" | "+")? ~ number
+  | sign? ~ number ~ ^"e" ~ sign? ~ number
+  | sign{,1} ~ number? ~ "." ~ number
+  | number
+}
+logical     =  { ^"true" | ^"false" }
+string      =  { (!(NEWLINE | COMMENT | "%" | single_keywords) ~ ANY)+ }
+block       =  { block_start ~ #block_values = (COMMENT | block_line)* ~ block_end }
+block_start =  { ^"%block" ~ PUSH(#block_name = keywords) ~ COMMENT? ~ NEWLINE? }
+block_line  = ${ !^"%endblock" ~ (WHITESPACE* ~ string)+ ~ WHITESPACE* ~ COMMENT? }
+block_end   =  { ^"%endblock" ~ POP ~ COMMENT? ~ NEWLINE? }
+
+kv_pair         = ${ #keyword = keywords ~ WHITESPACE* ~ ":" ~ (WHITESPACE* ~ #value = string+) }
+keywords        = ${ (ASCII_ALPHANUMERIC | "_")* ~ COMMENT? }
+single_keywords = ${ ^"SYMMETRY_GENERATE" ~ COMMENT? }
+
+cell_doc = _{ SOI ~ (kv_pair | block | single_keywords)* }
+
+lattice_cart_value = _{ real{3} }
+element_symbol     =  @{ ASCII_ALPHA{1, 2} }
+orbital            =  { (^"s" | ^"p" | ^"d" | ^"f") }
+hubbard_u_value    =  { orbital ~ ":" ~ real }
+hubbard_u_line     =  _{ SOI ~ #symbol = element_symbol ~ #atom_id = number? ~  hubbard_u_value+ }
