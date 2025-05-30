@@ -17,7 +17,10 @@ pub use keyword_value::{KeywordValue, SingleKeyword};
 pub struct CELLParser;
 
 impl CELLParser {
-    pub fn cell_doc_map(pairs: Pairs<'_, Rule>) -> ParsedCellDoc<'_> {
+    /// Build `HashMap<String, CELLObject>` from `Pairs<'_, Rule>`
+    /// Caution: I decided to convert all keys to **lowercase**, because while `CASTEP` parses the files caselessly,
+    /// it is hard to handle the case-sensitiveness in pure `HashMap`.
+    pub fn cell_doc_map(pairs: Pairs<'_, Rule>) -> ParsedCellDoc {
         ParsedCellDoc(HashMap::from_iter(pairs.into_iter().enumerate().map(
             |(idx, pair)| match pair.as_rule() {
                 Rule::block => {
@@ -25,7 +28,9 @@ impl CELLParser {
                     let block_name = inner_rules
                         .find_first_tagged("block_name")
                         .unwrap()
-                        .as_str();
+                        .as_str()
+                        // Forced to lowercase!
+                        .to_lowercase();
                     let block_lines = inner_rules
                         .find_tagged("block_values") // get all value lines
                         .flat_map(|lines| {
@@ -40,17 +45,19 @@ impl CELLParser {
                 }
                 Rule::kv_pair => {
                     let mut inner_rules = pair.into_inner();
+                    // Forced to lowercase!
                     let name = inner_rules.next().unwrap().as_str();
                     let value = inner_rules.next().unwrap().as_str().to_string();
                     (
-                        name,
+                        name.to_lowercase(),
                         CELLObject::KeywordValue(KeywordValue::new(idx, name.to_string(), value)),
                     )
                 }
                 Rule::single_keywords => {
+                    // Forced to lowercase!
                     let name = pair.as_str();
                     (
-                        name,
+                        name.to_lowercase(),
                         CELLObject::SingleKeyword(SingleKeyword::new(idx, name.to_string())),
                     )
                 }
@@ -77,16 +84,16 @@ impl CELLParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct ParsedCellDoc<'a>(HashMap<&'a str, CELLObject>);
+pub struct ParsedCellDoc(HashMap<String, CELLObject>);
 
-impl std::ops::DerefMut for ParsedCellDoc<'_> {
+impl std::ops::DerefMut for ParsedCellDoc {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
 }
 
-impl<'a> std::ops::Deref for ParsedCellDoc<'a> {
-    type Target = HashMap<&'a str, CELLObject>;
+impl std::ops::Deref for ParsedCellDoc {
+    type Target = HashMap<String, CELLObject>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

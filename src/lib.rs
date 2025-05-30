@@ -1,3 +1,4 @@
+mod chumsky_parser;
 mod error;
 mod pest_parser;
 
@@ -104,6 +105,6 @@ QUANTIZATION_AXIS :    0.0000    0.0000    1.0000
         let cell = CELLParser::parse(Rule::cell_doc, block).expect("unsuccessful parse");
         dbg!(&cell);
         let cell_doc: ParsedCellDoc = CELLParser::cell_doc_map(cell);
-        println!("{}", cell_doc.get("LATTICE_CART").unwrap());
+        println!("{}", cell_doc.get("lattice_cart").unwrap());
     }
 }
