@@ -67,7 +67,11 @@ impl Display for Block {
             "{}",
             [
                 format!("%BLOCK {}", self.name()),
-                self.values().join("\n"),
+                self.values()
+                    .iter()
+                    .map(|line| format!("  {line}"))
+                    .collect::<Vec<String>>()
+                    .join("\n"),
                 format!("%ENDBLOCK {}", self.name())
             ]
             .into_iter()
