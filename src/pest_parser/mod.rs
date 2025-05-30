@@ -68,7 +68,7 @@ impl CELLParser {
 
     /// Used for `.cell` format
     /// Maintained the order from parsed document
-    pub fn ordered_cell_doc(cell_doc_map: &HashMap<&str, CELLObject>) -> OrderedCellDoc {
+    pub fn ordered_cell_doc(cell_doc_map: &HashMap<String, CELLObject>) -> OrderedCellDoc {
         let mut ordered_cell_doc: Vec<CELLObject> = cell_doc_map.values().cloned().collect();
         ordered_cell_doc.sort_by_key(|obj| obj.order());
         OrderedCellDoc(ordered_cell_doc)
@@ -76,7 +76,7 @@ impl CELLParser {
 
     /// Used for `.param` format
     /// Maintained the order from parsed document
-    pub fn ordered_param_doc(cell_doc_map: &HashMap<&str, CELLObject>) -> OrderedParamDoc {
+    pub fn ordered_param_doc(cell_doc_map: &HashMap<String, CELLObject>) -> OrderedParamDoc {
         let mut ordered_param_doc: Vec<CELLObject> = cell_doc_map.values().cloned().collect();
         ordered_param_doc.sort_by_key(|obj| obj.order());
         OrderedParamDoc(ordered_param_doc)
