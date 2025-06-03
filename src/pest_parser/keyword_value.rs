@@ -14,8 +14,12 @@ impl Display for KeywordValue {
 }
 
 impl KeywordValue {
-    pub fn new(order: usize, name: String, value: String) -> Self {
-        Self { order, name, value }
+    pub fn new<V: Display>(order: usize, name: String, value: V) -> Self {
+        Self {
+            order,
+            name,
+            value: value.to_string(),
+        }
     }
 
     pub fn order(&self) -> usize {

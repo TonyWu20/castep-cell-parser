@@ -105,6 +105,65 @@ QUANTIZATION_AXIS :    0.0000    0.0000    1.0000
         let cell = CELLParser::parse(Rule::cell_doc, block).expect("unsuccessful parse");
         dbg!(&cell);
         let cell_doc: ParsedCellDoc = CELLParser::cell_doc_map(cell);
-        println!("{}", cell_doc.get("lattice_cart").unwrap());
+        println!("{}", cell_doc.get("species_pot").unwrap());
+        let pot = cell_doc
+            .get("species_pot")
+            .unwrap()
+            .as_block()
+            .map(|block| {
+                block
+                    .values()
+                    .iter()
+                    .map(|line| {
+                        let parsed = CELLParser::parse(Rule::potential_line, line).unwrap();
+                        parsed
+                            .find_first_tagged("potential_file")
+                            .map(|p| p.as_str().to_string())
+                            .unwrap()
+                    })
+                    .collect::<Vec<String>>()
+            })
+            .unwrap();
+        pot.iter().for_each(|p| println!("{}", p));
+    }
+    const PARAM: &str = r#"task : SinglePoint
+comment : CASTEP calculation from Materials Studio
+xc_functional : PBE
+spin_polarized : true
+spin :        4
+opt_strategy : Speed
+page_wvfns :        0
+cut_off_energy :      330.000000000000000
+grid_scale :        2.000000000000000
+fine_grid_scale :        3.000000000000000
+finite_basis_corr :        0
+elec_energy_tol :   5.000000000000000e-007
+max_scf_cycles :     6000
+fix_occupancy : false
+metals_method : dm
+mixing_scheme : Pulay
+mix_charge_amp :        0.500000000000000
+mix_spin_amp :        2.000000000000000
+mix_charge_gmax :        1.500000000000000
+mix_spin_gmax :        1.500000000000000
+mix_history_length :       20
+nextra_bands :       39
+smearing_width :        0.100000000000000
+spin_fix :        6
+num_dump_cycles : 0
+calculate_ELF : false
+calculate_stress : false
+popn_calculate : true
+calculate_hirshfeld : true
+calculate_densdiff : false
+popn_bond_cutoff :        3.000000000000000
+pdos_calculate_weights : true
+iprint:3
+"#;
+    #[test]
+    fn param() {
+        let parsed = CELLParser::parse(Rule::cell_doc, PARAM).expect("unsuccessful parse");
+        dbg!(&parsed);
+        let cell_param = CELLParser::cell_doc_map(parsed);
     }
 }

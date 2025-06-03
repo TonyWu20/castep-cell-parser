@@ -28,3 +28,4 @@ element_symbol     =  @{ ASCII_ALPHA{1, 2} }
 orbital            =  { (^"s" | ^"p" | ^"d" | ^"f") }
 hubbard_value    =  { orbital ~ ":" ~ real }
 hubbard_line     =  _{ SOI ~ #symbol = element_symbol ~ #atom_id = number? ~  hubbard_value+ }
+potential_line = _{SOI ~ #symbol = element_symbol ~ #potential_file = string}
