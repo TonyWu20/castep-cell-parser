@@ -1,12 +1,12 @@
 [package]
 name = "castep-cell-parser"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 description = "basic parser built on `pest` for `castep` `.cell` and `.param`"
 license = "MIT"
 
 [dependencies]
-chumsky = "0.10.1"
+# chumsky = "0.10.1"
 derive_builder = "0.20.2"
 from-pest = "0.3.3"
 pest = "2.8.0"
