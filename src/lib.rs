@@ -3,6 +3,7 @@ mod error;
 mod pest_parser;
 
 pub use error::CellParseError;
+pub use pest::Parser;
 pub use pest_parser::*;
 
 #[cfg(test)]
